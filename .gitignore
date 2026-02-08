@@ -1,0 +1,21 @@
+# Root .gitignore (community_board/.gitignore)
+
+# Specific files and security related 
+**/.env
+**/*.jks
+**/*.keystore
+
+# Common to Flutter/Dart (applies to all subpackages)
+**/.dart_tool/
+**/build/
+**/.packages
+**/.pub-cache/
+**/pubspec.lock 
+
+# IDE and OS files
+.idea/
+.vscode/
+**/.DS_Store
+
+# FVM Version Cache
+**/.fvm/

@@ -1,0 +1,26 @@
+include: package:flutter_lints/flutter.yaml
+
+analyzer:
+  exclude:
+    - build/**
+    - .dart_tool/**
+    - lib/generated_plugin_registrant.dart
+    - test/**.mocks.dart
+    - "**/*.g.dart"
+    - "**.config.dart"
+
+linter:
+  rules:
+    avoid_print: false
+    no_leading_underscores_for_local_identifiers: false
+    omit_local_variable_types: false
+    prefer_const_constructors: true
+    prefer_const_constructors_in_immutables: true
+    prefer_final_fields: true
+    prefer_final_in_for_each: true
+    prefer_relative_imports: true
+    sort_constructors_first: true
+    unawaited_futures: true
+
+formatter:
+  trailing_commas: preserve
