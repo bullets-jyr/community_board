@@ -12,6 +12,7 @@
 import 'package:data_supabase/auth.dart' as _i561;
 import 'package:domain/auth.dart' as _i378;
 import 'package:get_it/get_it.dart' as _i174;
+import 'package:go_router/go_router.dart' as _i583;
 import 'package:injectable/injectable.dart' as _i526;
 import 'package:supabase_flutter/supabase_flutter.dart' as _i454;
 
@@ -49,6 +50,9 @@ extension GetItInjectableX on _i174.GetIt {
     );
     gh.factory<_i1018.LoginBloc>(
       () => _i1018.LoginBloc(loginUseCase: gh<_i378.LoginUseCase>()),
+    );
+    gh.singleton<_i583.GoRouter>(
+      () => registerModule.router(gh<_i652.AuthenticationBloc>()),
     );
     return this;
   }
