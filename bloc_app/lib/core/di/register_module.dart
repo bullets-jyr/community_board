@@ -1,5 +1,7 @@
 import 'package:data_supabase/auth.dart';
+import 'package:data_supabase/post.dart';
 import 'package:domain/auth.dart';
+import 'package:domain/post.dart';
 import 'package:go_router/go_router.dart';
 import 'package:injectable/injectable.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
@@ -24,7 +26,11 @@ abstract class RegisterModule {
   AuthRepositoryImpl get authRepository;
 
   // post
+  @LazySingleton(as: PostRemoteDataSource)
+  SupabasePostRemoteDataSource get postRemoteDataSource;
 
+  @LazySingleton(as: PostRepository)
+  PostRepositoryImpl get postRepository;
 
   // profile
 
@@ -44,7 +50,8 @@ abstract class RegisterModule {
   LogoutUseCase get logoutUseCase;
 
   // post
-
+  @injectable
+  GetPostsUseCase get getPostsUseCase;
 
   // profile
 
