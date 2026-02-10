@@ -1,8 +1,10 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 
 import 'core/di/di.dart';
+import 'features/auth/presentation/blocs/authentication/authentication_bloc.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -23,15 +25,20 @@ class MyApp extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return MaterialApp(
-      title: 'Community Board Bloc',
-      debugShowCheckedModeBanner: false,
-      theme: ThemeData(
-        colorScheme: .fromSeed(seedColor: Colors.deepPurple),
-      ),
-      home: const Scaffold(
-        body: Center(
-          child: Text('Project Setup Complete!'),
+    return MultiBlocProvider(
+      providers: [
+        BlocProvider.value(value: getIt<AuthenticationBloc>()),
+      ],
+      child: MaterialApp(
+        title: 'Community Board Bloc',
+        debugShowCheckedModeBanner: false,
+        theme: ThemeData(
+          colorScheme: .fromSeed(seedColor: Colors.deepPurple),
+        ),
+        home: const Scaffold(
+          body: Center(
+            child: Text('Project Setup Complete!'),
+          ),
         ),
       ),
     );

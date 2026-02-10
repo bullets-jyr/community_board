@@ -10,6 +10,7 @@ part 'authentication_event.dart';
 
 part 'authentication_state.dart';
 
+@singleton
 class AuthenticationBloc
     extends Bloc<AuthenticationEvent, AuthenticationState> {
   AuthenticationBloc({
@@ -50,6 +51,7 @@ class AuthenticationBloc
     await _logoutUseCase(const NoParams());
   }
 
+  @disposeMethod
   @override
   Future<void> close() {
     _authStateSubscription?.cancel();
