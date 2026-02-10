@@ -17,6 +17,7 @@ import 'package:supabase_flutter/supabase_flutter.dart' as _i454;
 
 import '../../features/auth/presentation/blocs/authentication/authentication_bloc.dart'
     as _i652;
+import '../../features/auth/presentation/blocs/login/login_bloc.dart' as _i1018;
 import 'register_module.dart' as _i291;
 
 extension GetItInjectableX on _i174.GetIt {
@@ -41,6 +42,9 @@ extension GetItInjectableX on _i174.GetIt {
         logoutUseCase: gh<_i378.LogoutUseCase>(),
       ),
       dispose: (i) => i.close(),
+    );
+    gh.factory<_i1018.LoginBloc>(
+      () => _i1018.LoginBloc(loginUseCase: gh<_i378.LoginUseCase>()),
     );
     return this;
   }
