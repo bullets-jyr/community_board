@@ -12,3 +12,5 @@ final class PostListFetched extends PostListEvent {}
 final class PostListNextPageFetched extends PostListEvent {}
 
 final class PostListRefreshed extends PostListEvent {}
+
+final class PostListTransientFailureConsumed extends PostListEvent {}
