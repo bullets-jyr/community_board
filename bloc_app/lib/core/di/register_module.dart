@@ -53,6 +53,12 @@ abstract class RegisterModule {
   @injectable
   GetPostsUseCase get getPostsUseCase;
 
+  @injectable
+  CreatePostUseCase get createPostUseCase;
+
+  @injectable
+  UploadPostImageUseCase get uploadPostImageUseCase;
+
   // profile
 
 

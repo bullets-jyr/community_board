@@ -22,6 +22,8 @@ import '../../features/auth/presentation/blocs/authentication/authentication_blo
     as _i652;
 import '../../features/auth/presentation/blocs/login/login_bloc.dart' as _i1018;
 import '../../features/auth/presentation/blocs/signup/signup_bloc.dart' as _i41;
+import '../../features/post/presentation/blocs/post_form/post_form_bloc.dart'
+    as _i79;
 import '../../features/post/presentation/blocs/post_list/post_list_bloc.dart'
     as _i409;
 import 'register_module.dart' as _i291;
@@ -60,8 +62,18 @@ extension GetItInjectableX on _i174.GetIt {
       () => _i1018.LoginBloc(loginUseCase: gh<_i378.LoginUseCase>()),
     );
     gh.factory<_i456.GetPostsUseCase>(() => registerModule.getPostsUseCase);
+    gh.factory<_i456.CreatePostUseCase>(() => registerModule.createPostUseCase);
+    gh.factory<_i456.UploadPostImageUseCase>(
+      () => registerModule.uploadPostImageUseCase,
+    );
     gh.factory<_i409.PostListBloc>(
       () => _i409.PostListBloc(getPostsUseCase: gh<_i456.GetPostsUseCase>()),
+    );
+    gh.factory<_i79.PostFormBloc>(
+      () => _i79.PostFormBloc(
+        createPostUseCase: gh<_i456.CreatePostUseCase>(),
+        uploadPostImageUseCase: gh<_i456.UploadPostImageUseCase>(),
+      ),
     );
     gh.singleton<_i583.GoRouter>(
       () => registerModule.router(gh<_i652.AuthenticationBloc>()),
@@ -112,4 +124,14 @@ class _$RegisterModule extends _i291.RegisterModule {
   @override
   _i456.GetPostsUseCase get getPostsUseCase =>
       _i456.GetPostsUseCase(postRepository: _getIt<_i456.PostRepository>());
+
+  @override
+  _i456.CreatePostUseCase get createPostUseCase =>
+      _i456.CreatePostUseCase(postRepository: _getIt<_i456.PostRepository>());
+
+  @override
+  _i456.UploadPostImageUseCase get uploadPostImageUseCase =>
+      _i456.UploadPostImageUseCase(
+        postRepository: _getIt<_i456.PostRepository>(),
+      );
 }
