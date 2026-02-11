@@ -26,6 +26,7 @@ import '../../features/post/presentation/blocs/post_form/post_form_bloc.dart'
     as _i79;
 import '../../features/post/presentation/blocs/post_list/post_list_bloc.dart'
     as _i409;
+import '../bus/global_event_bus.dart' as _i91;
 import 'register_module.dart' as _i291;
 
 extension GetItInjectableX on _i174.GetIt {
@@ -36,6 +37,10 @@ extension GetItInjectableX on _i174.GetIt {
   }) {
     final gh = _i526.GetItHelper(this, environment, environmentFilter);
     final registerModule = _$RegisterModule(this);
+    gh.singleton<_i91.GlobalEventBus>(
+      () => _i91.GlobalEventBus(),
+      dispose: (i) => i.dispose(),
+    );
     gh.singleton<_i454.SupabaseClient>(() => registerModule.supabaseClient);
     gh.lazySingleton<_i561.AuthRemoteDataSource>(
       () => registerModule.authRemoteDataSource,
@@ -66,17 +71,21 @@ extension GetItInjectableX on _i174.GetIt {
     gh.factory<_i456.UploadPostImageUseCase>(
       () => registerModule.uploadPostImageUseCase,
     );
-    gh.factory<_i409.PostListBloc>(
-      () => _i409.PostListBloc(getPostsUseCase: gh<_i456.GetPostsUseCase>()),
-    );
     gh.factory<_i79.PostFormBloc>(
       () => _i79.PostFormBloc(
         createPostUseCase: gh<_i456.CreatePostUseCase>(),
         uploadPostImageUseCase: gh<_i456.UploadPostImageUseCase>(),
+        globalEventBus: gh<_i91.GlobalEventBus>(),
       ),
     );
     gh.singleton<_i583.GoRouter>(
       () => registerModule.router(gh<_i652.AuthenticationBloc>()),
+    );
+    gh.factory<_i409.PostListBloc>(
+      () => _i409.PostListBloc(
+        getPostsUseCase: gh<_i456.GetPostsUseCase>(),
+        globalEventBus: gh<_i91.GlobalEventBus>(),
+      ),
     );
     return this;
   }

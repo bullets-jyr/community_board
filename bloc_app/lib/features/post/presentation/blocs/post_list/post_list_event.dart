@@ -14,3 +14,12 @@ final class PostListNextPageFetched extends PostListEvent {}
 final class PostListRefreshed extends PostListEvent {}
 
 final class PostListTransientFailureConsumed extends PostListEvent {}
+
+final class _GlobalEventReceived extends PostListEvent {
+  const _GlobalEventReceived({required this.event});
+
+  final GlobalEvent event;
+
+  @override
+  List<Object> get props => [event];
+}

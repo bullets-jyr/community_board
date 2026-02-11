@@ -6,6 +6,9 @@ import 'package:domain/post.dart';
 import 'package:equatable/equatable.dart';
 import 'package:injectable/injectable.dart';
 
+import '../../../../../core/bus/global_event.dart';
+import '../../../../../core/bus/global_event_bus.dart';
+
 part 'post_list_event.dart';
 
 part 'post_list_state.dart';
@@ -16,15 +19,24 @@ const _pageSize = 5;
 class PostListBloc extends Bloc<PostListEvent, PostListState> {
   PostListBloc({
     required GetPostsUseCase getPostsUseCase,
+    required GlobalEventBus globalEventBus,
   }) : _getPostsUseCase = getPostsUseCase,
+       _globalEventBus = globalEventBus,
        super(const PostListState()) {
     on<PostListFetched>(_onPostListFetched);
     on<PostListNextPageFetched>(_onPostListNextPageFetched);
     on<PostListRefreshed>(_onPostListRefreshed);
     on<PostListTransientFailureConsumed>(_onPostListTransientFailureConsumed);
+    on<_GlobalEventReceived>(_onGlobalEventReceived);
+
+    _globalEventBusSubscription = _globalEventBus.stream.listen((event) {
+      add(_GlobalEventReceived(event: event));
+    });
   }
 
   final GetPostsUseCase _getPostsUseCase;
+  final GlobalEventBus _globalEventBus;
+  StreamSubscription<GlobalEvent>? _globalEventBusSubscription;
 
   bool get _isBusy =>
       state.status == PostListStatus.loading ||
@@ -128,9 +140,28 @@ class PostListBloc extends Bloc<PostListEvent, PostListState> {
   }
 
   void _onPostListTransientFailureConsumed(
-      PostListTransientFailureConsumed event,
-      Emitter<PostListState> emit,
-      ) {
+    PostListTransientFailureConsumed event,
+    Emitter<PostListState> emit,
+  ) {
     emit(state.copyWith(transientFailure: () => null));
+  }
+
+  void _onGlobalEventReceived(
+    _GlobalEventReceived event,
+    Emitter<PostListState> emit,
+  ) {
+    if (state.status != PostListStatus.fetchingNextPage && _isBusy) return;
+
+    switch (event.event) {
+      case PostCreatedDispatched(post: final newPost):
+        final currentPosts = state.posts;
+        emit(state.copyWith(posts: [newPost, ...currentPosts]));
+    }
+  }
+
+  @override
+  Future<void> close() {
+    _globalEventBusSubscription?.cancel();
+    return super.close();
   }
 }
