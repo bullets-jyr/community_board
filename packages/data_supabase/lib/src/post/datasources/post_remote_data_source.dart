@@ -2,6 +2,7 @@ import 'dart:io';
 
 import 'package:domain/post.dart';
 
+import '../models/comment_display_model.dart';
 import '../models/post_display_model.dart';
 
 abstract interface class PostRemoteDataSource {
@@ -20,5 +21,13 @@ abstract interface class PostRemoteDataSource {
   Future<ImageUploadResult> uploadPostImage({
     required File image,
     String? postId,
+  });
+
+  Future<PostDisplayModel> getPostDetail({required String postId});
+
+  Future<List<CommentDisplayModel>> getComments({
+    required String postId,
+    required int offset,
+    required int limit,
   });
 }
