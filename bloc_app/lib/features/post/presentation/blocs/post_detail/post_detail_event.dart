@@ -15,3 +15,16 @@ final class PostDetailFetched extends PostDetailEvent {
   @override
   List<Object> get props => [postId];
 }
+
+final class PostDetailLikeToggled extends PostDetailEvent {
+  const PostDetailLikeToggled();
+}
+
+final class _PostUpdatedFromBus extends PostDetailEvent {
+  const _PostUpdatedFromBus({required this.post});
+
+  final PostDisplay post;
+
+  @override
+  List<Object> get props => [post];
+}

@@ -85,6 +85,8 @@ extension GetItInjectableX on _i174.GetIt {
     gh.factory<_i169.PostDetailBloc>(
       () => _i169.PostDetailBloc(
         getPostDetailUseCase: gh<_i456.GetPostDetailUseCase>(),
+        toggleLikeUseCase: gh<_i456.ToggleLikeUseCase>(),
+        globalEventBus: gh<_i91.GlobalEventBus>(),
       ),
     );
     gh.factory<_i1009.CommentListBloc>(
