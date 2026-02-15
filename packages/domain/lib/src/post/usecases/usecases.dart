@@ -4,3 +4,6 @@ export 'create_post_usecase.dart';
 export 'get_post_detail_usecase.dart';
 export 'get_comments_usecase.dart';
 export 'toggle_like_usecase.dart';
+export 'create_comment_usecase.dart';
+export 'delete_comment_usecase.dart';
+export 'update_comment_usecase.dart';
