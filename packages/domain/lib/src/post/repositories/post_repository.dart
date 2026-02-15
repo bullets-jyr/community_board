@@ -47,4 +47,15 @@ abstract interface class PostRepository {
     required String commentId,
     required String newContent,
   });
+
+  Future<Either<Failure, void>> deletePost({required String postId});
+
+  Future<Either<Failure, void>> deletePostFolder({required String postId});
+
+  Future<Either<Failure, PostDisplay>> updatePost({
+    required String postId,
+    required String title,
+    required String content,
+    String? imageUrl,
+  });
 }
