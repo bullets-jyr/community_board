@@ -3,6 +3,7 @@ import 'dart:io';
 import 'package:domain/post.dart';
 
 import '../models/comment_display_model.dart';
+import '../models/like_result_model.dart';
 import '../models/post_display_model.dart';
 
 abstract interface class PostRemoteDataSource {
@@ -30,4 +31,6 @@ abstract interface class PostRemoteDataSource {
     required int offset,
     required int limit,
   });
+
+  Future<LikeResultModel> toggleLike({required String postId});
 }

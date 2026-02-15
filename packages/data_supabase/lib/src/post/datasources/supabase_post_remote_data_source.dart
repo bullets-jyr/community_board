@@ -7,6 +7,7 @@ import 'package:supabase_flutter/supabase_flutter.dart';
 import 'package:uuid/uuid.dart';
 
 import '../models/comment_display_model.dart';
+import '../models/like_result_model.dart';
 import '../models/post_display_model.dart';
 import 'post_remote_data_source.dart';
 
@@ -190,6 +191,33 @@ class SupabasePostRemoteDataSource implements PostRemoteDataSource {
       return commentMaps
           .map((map) => CommentDisplayModel.fromJson(map))
           .toList();
+    } on AuthenticationException {
+      rethrow;
+    } on PostgrestException catch (e) {
+      if (e.code == PostgresErrors.insufficientPrivilege) {
+        throw PermissionException(message: e.message);
+      }
+      throw DatabaseException(message: e.message);
+    } on SocketException {
+      throw const NetworkException();
+    } catch (e) {
+      throw UnknownException(message: e.toString());
+    }
+  }
+
+  @override
+  Future<LikeResultModel> toggleLike({required String postId}) async {
+    try {
+      if (_supabaseClient.auth.currentUser == null) {
+        throw const AuthenticationException(
+          message: 'User is not authenticated',
+        );
+      }
+      final result = await _supabaseClient.rpc(
+        DBFunctions.handleLike,
+        params: {'p_post_id': postId},
+      );
+      return LikeResultModel.fromJson(result as Map<String, dynamic>);
     } on AuthenticationException {
       rethrow;
     } on PostgrestException catch (e) {

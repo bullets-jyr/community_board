@@ -5,6 +5,7 @@ import 'package:fpdart/fpdart.dart';
 
 import '../dto/image_upload_result.dart';
 import '../entities/comment_display.dart';
+import '../entities/like_result.dart';
 import '../entities/post_display.dart';
 
 abstract interface class PostRepository {
@@ -32,4 +33,6 @@ abstract interface class PostRepository {
     required int offset,
     required int limit,
   });
+
+  Future<Either<Failure, LikeResult>> toggleLike({required String postId});
 }

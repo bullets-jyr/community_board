@@ -136,4 +136,24 @@ class PostRepositoryImpl implements PostRepository {
       return Left(UnknownFailure(message: e.message));
     }
   }
+
+  @override
+  Future<Either<Failure, LikeResult>> toggleLike({
+    required String postId,
+  }) async {
+    try {
+      final likeResult = await _postRemoteDataSource.toggleLike(postId: postId);
+      return Right(likeResult);
+    } on AuthenticationException catch (e) {
+      return Left(AuthenticationFailure(message: e.message));
+    } on PermissionException catch (e) {
+      return Left(PermissionFailure(message: e.message));
+    } on DatabaseException catch (e) {
+      return Left(ServerFailure(message: e.message));
+    } on NetworkException catch (e) {
+      return Left(NetworkFailure(message: e.message));
+    } on UnknownException catch (e) {
+      return Left(UnknownFailure(message: e.message));
+    }
+  }
 }
