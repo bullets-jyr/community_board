@@ -330,4 +330,108 @@ class SupabasePostRemoteDataSource implements PostRemoteDataSource {
       throw UnknownException(message: e.toString());
     }
   }
+
+  @override
+  Future<void> deletePost({required String postId}) async {
+    try {
+      if (_supabaseClient.auth.currentUser == null) {
+        throw const AuthenticationException(
+          message: 'User is not authenticated',
+        );
+      }
+
+      await _supabaseClient.from(Tables.posts).delete().match({'id': postId});
+    } on AuthenticationException {
+      rethrow;
+    } on PostgrestException catch (e) {
+      if (e.code == PostgresErrors.insufficientPrivilege) {
+        throw PermissionException(message: e.message);
+      }
+      throw DatabaseException(message: e.message);
+    } on SocketException {
+      throw const NetworkException();
+    } catch (e) {
+      throw UnknownException(message: e.toString());
+    }
+  }
+
+  @override
+  Future<void> deletePostFolder({required String postId}) async {
+    try {
+      final userId = _supabaseClient.auth.currentUser?.id;
+      if (userId == null) {
+        throw const AuthenticationException(
+          message: 'User not authenticated for image deletion.',
+        );
+      }
+      final folderPath = 'public/$userId/$postId';
+
+      final fileList = await _supabaseClient.storage
+          .from(Storage.postImages)
+          .list(path: folderPath);
+      if (fileList.isEmpty) {
+        return;
+      }
+
+      final filesToRemove = fileList
+          .map((file) => '$folderPath/${file.name}')
+          .toList();
+
+      await _supabaseClient.storage
+          .from(Storage.postImages)
+          .remove(filesToRemove);
+    } on AuthenticationException {
+      rethrow;
+    } on StorageException catch (e) {
+      throw StorageServerException(message: e.message);
+    } on SocketException {
+      throw const NetworkException();
+    } catch (e) {
+      throw UnknownException(message: e.toString());
+    }
+  }
+
+  @override
+  Future<PostDisplayModel> updatePost({
+    required String postId,
+    required String title,
+    required String content,
+    String? imageUrl,
+  }) async {
+    try {
+      if (_supabaseClient.auth.currentUser == null) {
+        throw const AuthenticationException(
+          message: 'User is not authenticated',
+        );
+      }
+
+      final result = await _supabaseClient
+          .rpc(
+            DBFunctions.updatePostAndReturnPostDisplayView,
+            params: {
+              'p_post_id': postId,
+              'p_title': title,
+              'p_content': content,
+              'p_image_url': imageUrl,
+            },
+          )
+          .single();
+
+      return PostDisplayModel.fromJson(result);
+    } on AuthenticationException {
+      rethrow;
+    } on PostgrestException catch (e) {
+      if (e.code == PostgresErrors.insufficientPrivilege) {
+        throw PermissionException(message: e.message);
+      }
+      if (e.code == PostgresErrors.moreThanOneOrNoItemsReturned) {
+        throw NotFoundException(message: e.message);
+      }
+      throw DatabaseException(message: e.message);
+    } on SocketException {
+      throw const NetworkException();
+    } catch (e) {
+      throw UnknownException(message: e.toString());
+    }
+  }
 }

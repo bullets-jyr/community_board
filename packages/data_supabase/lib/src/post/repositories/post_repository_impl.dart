@@ -228,4 +228,65 @@ class PostRepositoryImpl implements PostRepository {
       return Left(UnknownFailure(message: e.message));
     }
   }
+
+  @override
+  Future<Either<Failure, void>> deletePost({required String postId}) async {
+    try {
+      await _postRemoteDataSource.deletePost(postId: postId);
+      return const Right(null);
+    } on AuthenticationException catch (e) {
+      return Left(AuthenticationFailure(message: e.message));
+    } on PermissionException catch (e) {
+      return Left(PermissionFailure(message: e.message));
+    } on DatabaseException catch (e) {
+      return Left(ServerFailure(message: e.message));
+    } on NetworkException catch (e) {
+      return Left(NetworkFailure(message: e.message));
+    } on UnknownException catch (e) {
+      return Left(UnknownFailure(message: e.message));
+    }
+  }
+
+  @override
+  Future<Either<Failure, void>> deletePostFolder({
+    required String postId,
+  }) async {
+    try {
+      await _postRemoteDataSource.deletePostFolder(postId: postId);
+      return const Right(null);
+    } catch (e) {
+      print('deletePostFolder failed, but proceeding: $e');
+      return const Right(null);
+    }
+  }
+
+  @override
+  Future<Either<Failure, PostDisplay>> updatePost({
+    required String postId,
+    required String title,
+    required String content,
+    String? imageUrl,
+  }) async {
+    try {
+      final updatedPost = await _postRemoteDataSource.updatePost(
+        postId: postId,
+        title: title,
+        content: content,
+        imageUrl: imageUrl,
+      );
+      return Right(updatedPost);
+    } on AuthenticationException catch (e) {
+      return Left(AuthenticationFailure(message: e.message));
+    } on PermissionException catch (e) {
+      return Left(PermissionFailure(message: e.message));
+    } on NotFoundException catch (e) {
+      return Left(NotFoundFailure(message: e.message));
+    } on DatabaseException catch (e) {
+      return Left(ServerFailure(message: e.message));
+    } on NetworkException catch (e) {
+      return Left(NetworkFailure(message: e.message));
+    } on UnknownException catch (e) {
+      return Left(UnknownFailure(message: e.message));
+    }
+  }
 }

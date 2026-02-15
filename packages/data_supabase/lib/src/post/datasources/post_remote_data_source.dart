@@ -45,4 +45,15 @@ abstract interface class PostRemoteDataSource {
     required String commentId,
     required String newContent,
   });
+
+  Future<void> deletePost({required String postId});
+
+  Future<void> deletePostFolder({required String postId});
+
+  Future<PostDisplayModel> updatePost({
+    required String postId,
+    required String title,
+    required String content,
+    String? imageUrl,
+  });
 }
