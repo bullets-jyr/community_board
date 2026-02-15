@@ -1,6 +1,8 @@
 import 'dart:io';
 
+import 'package:cached_network_image/cached_network_image.dart';
 import 'package:core/utils.dart';
+import 'package:domain/post.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
@@ -18,7 +20,13 @@ class PostFormPage extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return BlocProvider(
-      create: (context) => getIt<PostFormBloc>(),
+      create: (context) {
+        final bloc = getIt<PostFormBloc>();
+        if (postId != null) {
+          bloc.add(PostFormPrefilled(postId: postId!));
+        }
+        return bloc;
+      },
       child: PostFormView(isEditMode: postId != null),
     );
   }
@@ -41,6 +49,12 @@ class _PostFormViewState extends State<PostFormView> {
 
   File? _selectedImage;
 
+  String? _existingImageUrl;
+  bool _imageWasRemoved = false;
+  PostDisplay? _originalPost;
+
+  bool _isSaving = false;
+
   @override
   void dispose() {
     _titleController.dispose();
@@ -57,6 +71,7 @@ class _PostFormViewState extends State<PostFormView> {
       if (pickedFile != null) {
         setState(() {
           _selectedImage = File(pickedFile.path);
+          _imageWasRemoved = false;
         });
       }
     } on PlatformException catch (e) {
@@ -68,7 +83,7 @@ class _PostFormViewState extends State<PostFormView> {
     }
   }
 
-  void _submit() {
+  void _submit(PostDisplay? postToEdit) {
     setState(() {
       _autovalidateMode = AutovalidateMode.always;
     });
@@ -76,16 +91,32 @@ class _PostFormViewState extends State<PostFormView> {
     final form = _formKey.currentState;
     if (form == null || !form.validate()) return;
 
+    setState(() {
+      _isSaving = true;
+    });
+
     final title = _titleController.text.trim();
     final content = _contentController.text.trim();
 
-    context.read<PostFormBloc>().add(
-      PostSubmitted(
-        title: title,
-        content: content,
-        imageFile: _selectedImage,
-      ),
-    );
+    if (postToEdit != null) {
+      context.read<PostFormBloc>().add(
+        PostEdited(
+          originalPost: postToEdit,
+          newTitle: title,
+          newContent: content,
+          newImageFile: _selectedImage,
+          imageWasRemoved: _imageWasRemoved,
+        ),
+      );
+    } else {
+      context.read<PostFormBloc>().add(
+        PostSubmitted(
+          title: title,
+          content: content,
+          imageFile: _selectedImage,
+        ),
+      );
+    }
   }
 
   Widget _buildImagePreview() {
@@ -97,6 +128,17 @@ class _PostFormViewState extends State<PostFormView> {
         fit: BoxFit.cover,
         width: double.infinity,
         height: double.infinity,
+      );
+    } else if (_existingImageUrl != null && !_imageWasRemoved) {
+      imageWidget = CachedNetworkImage(
+        imageUrl: _existingImageUrl!,
+        fit: BoxFit.cover,
+        width: double.infinity,
+        height: double.infinity,
+        placeholder: (context, url) =>
+            const Center(child: CircularProgressIndicator()),
+        errorWidget: (context, url, error) =>
+            const Center(child: Icon(Icons.error)),
       );
     }
 
@@ -112,6 +154,7 @@ class _PostFormViewState extends State<PostFormView> {
               onPressed: () {
                 setState(() {
                   _selectedImage = null;
+                  _imageWasRemoved = true;
                 });
               },
               icon: const Icon(Icons.cancel, color: Colors.white, size: 28),
@@ -147,17 +190,28 @@ class _PostFormViewState extends State<PostFormView> {
       listener: (context, state) {
         if (state is PostFormLoadFailure) {
           showErrorSnackbar(context, message: state.failure.message);
+          setState(() {
+            _isSaving = false;
+          });
         }
         if (state is PostFormLoadSuccess) {
-          context.pop();
+          if (widget.isEditMode && _originalPost == null) {
+            _originalPost = state.data;
+            _titleController.text = _originalPost!.title;
+            _contentController.text = _originalPost!.content;
+            _existingImageUrl = _originalPost!.imageUrl;
+          } else {
+            context.pop();
+          }
         }
       },
       builder: (context, state) {
         final isLoading = state is PostFormLoadInProgress;
+        final isEditMode = widget.isEditMode;
 
         return Scaffold(
-          appBar: AppBar(title: const Text('Create Post')),
-          body: isLoading
+          appBar: AppBar(title: Text(isEditMode ? 'Edit Post' : 'Create Post')),
+          body: _isSaving || (isLoading && _originalPost == null)
               ? const Center(child: CircularProgressIndicator())
               : SingleChildScrollView(
                   padding: const EdgeInsets.all(16),
@@ -222,19 +276,11 @@ class _PostFormViewState extends State<PostFormView> {
                         const SizedBox(height: 24),
 
                         ElevatedButton(
-                          onPressed: isLoading ? null : _submit,
+                          onPressed: () => _submit(_originalPost),
                           style: ElevatedButton.styleFrom(
                             padding: const EdgeInsets.symmetric(vertical: 16),
                           ),
-                          child: isLoading
-                              ? const SizedBox.square(
-                                  dimension: 24,
-                                  child: CircularProgressIndicator(
-                                    color: Colors.white,
-                                    strokeWidth: 2,
-                                  ),
-                                )
-                              : const Text('Submit'),
+                          child: Text(isEditMode ? 'Update' : 'Submit'),
                         ),
                       ],
                     ),
