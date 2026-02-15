@@ -11,6 +11,7 @@ import '../../../../core/di/di.dart';
 import '../../../auth/presentation/blocs/authentication/authentication_bloc.dart';
 import '../blocs/comment_list/comment_list_bloc.dart';
 import '../blocs/post_detail/post_detail_bloc.dart';
+import '../widgets/comment_list_view.dart';
 
 class PostDetailPage extends StatelessWidget {
   const PostDetailPage({super.key, required this.postId});
