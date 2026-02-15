@@ -22,6 +22,8 @@ import '../../features/auth/presentation/blocs/authentication/authentication_blo
     as _i652;
 import '../../features/auth/presentation/blocs/login/login_bloc.dart' as _i1018;
 import '../../features/auth/presentation/blocs/signup/signup_bloc.dart' as _i41;
+import '../../features/post/presentation/blocs/comment_list/comment_list_bloc.dart'
+    as _i1009;
 import '../../features/post/presentation/blocs/post_detail/post_detail_bloc.dart'
     as _i169;
 import '../../features/post/presentation/blocs/post_form/post_form_bloc.dart'
@@ -82,6 +84,11 @@ extension GetItInjectableX on _i174.GetIt {
     gh.factory<_i169.PostDetailBloc>(
       () => _i169.PostDetailBloc(
         getPostDetailUseCase: gh<_i456.GetPostDetailUseCase>(),
+      ),
+    );
+    gh.factory<_i1009.CommentListBloc>(
+      () => _i1009.CommentListBloc(
+        getCommentsUseCase: gh<_i456.GetCommentsUseCase>(),
       ),
     );
     gh.factory<_i79.PostFormBloc>(
