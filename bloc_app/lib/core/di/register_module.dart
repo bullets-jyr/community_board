@@ -77,6 +77,15 @@ abstract class RegisterModule {
   @injectable
   UpdateCommentUseCase get updateCommentUseCase;
 
+  @injectable
+  DeletePostUseCase get deletePostUseCase;
+
+  @injectable
+  DeletePostFolderUseCase get deletePostFolderUseCase;
+
+  @injectable
+  UpdatePostUseCase get updatePostUseCase;
+
   // profile
 
 

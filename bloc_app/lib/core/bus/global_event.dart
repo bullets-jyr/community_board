@@ -25,3 +25,12 @@ final class PostUpdatedDispatched extends GlobalEvent {
   @override
   List<Object?> get props => [post];
 }
+
+final class PostDeletedDispatched extends GlobalEvent {
+  const PostDeletedDispatched({required this.postId});
+
+  final String postId;
+
+  @override
+  List<Object?> get props => [postId];
+}

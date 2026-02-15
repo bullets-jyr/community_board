@@ -32,3 +32,5 @@ final class _GlobalEventReceived extends PostListEvent {
   @override
   List<Object> get props => [event];
 }
+
+final class _PostListRefillRequested extends PostListEvent {}

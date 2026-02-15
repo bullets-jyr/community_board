@@ -20,6 +20,12 @@ final class PostDetailLikeToggled extends PostDetailEvent {
   const PostDetailLikeToggled();
 }
 
+final class PostDeleted extends PostDetailEvent {
+  const PostDeleted();
+}
+
+final class PostDetailTransientFailureConsumed extends PostDetailEvent {}
+
 final class _PostUpdatedFromBus extends PostDetailEvent {
   const _PostUpdatedFromBus({required this.post});
 
