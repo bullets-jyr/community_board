@@ -96,17 +96,19 @@ extension GetItInjectableX on _i174.GetIt {
       () => registerModule.deletePostFolderUseCase,
     );
     gh.factory<_i456.UpdatePostUseCase>(() => registerModule.updatePostUseCase);
-    gh.factory<_i409.PostListBloc>(
-      () => _i409.PostListBloc(
-        getPostsUseCase: gh<_i456.GetPostsUseCase>(),
-        toggleLikeUseCase: gh<_i456.ToggleLikeUseCase>(),
-        globalEventBus: gh<_i91.GlobalEventBus>(),
-      ),
-    );
     gh.factory<_i79.PostFormBloc>(
       () => _i79.PostFormBloc(
         createPostUseCase: gh<_i456.CreatePostUseCase>(),
         uploadPostImageUseCase: gh<_i456.UploadPostImageUseCase>(),
+        updatePostUseCase: gh<_i456.UpdatePostUseCase>(),
+        getPostDetailUseCase: gh<_i456.GetPostDetailUseCase>(),
+        globalEventBus: gh<_i91.GlobalEventBus>(),
+      ),
+    );
+    gh.factory<_i409.PostListBloc>(
+      () => _i409.PostListBloc(
+        getPostsUseCase: gh<_i456.GetPostsUseCase>(),
+        toggleLikeUseCase: gh<_i456.ToggleLikeUseCase>(),
         globalEventBus: gh<_i91.GlobalEventBus>(),
       ),
     );

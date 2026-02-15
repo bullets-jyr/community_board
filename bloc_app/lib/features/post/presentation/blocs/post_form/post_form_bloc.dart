@@ -19,16 +19,24 @@ class PostFormBloc extends Bloc<PostFormEvent, PostFormState> {
   PostFormBloc({
     required CreatePostUseCase createPostUseCase,
     required UploadPostImageUseCase uploadPostImageUseCase,
+    required UpdatePostUseCase updatePostUseCase,
+    required GetPostDetailUseCase getPostDetailUseCase,
     required GlobalEventBus globalEventBus,
   }) : _createPostUseCase = createPostUseCase,
        _uploadPostImageUseCase = uploadPostImageUseCase,
+       _updatePostUseCase = updatePostUseCase,
+       _getPostDetailUseCase = getPostDetailUseCase,
        _globalEventBus = globalEventBus,
        super(const PostFormInitial()) {
     on<PostSubmitted>(_onPostSubmitted);
+    on<PostFormPrefilled>(_onPostFormPrefilled);
+    on<PostEdited>(_onPostEdited);
   }
 
   final CreatePostUseCase _createPostUseCase;
   final UploadPostImageUseCase _uploadPostImageUseCase;
+  final UpdatePostUseCase _updatePostUseCase;
+  final GetPostDetailUseCase _getPostDetailUseCase;
   final GlobalEventBus _globalEventBus;
 
   Future<void> _onPostSubmitted(
@@ -77,5 +85,45 @@ class PostFormBloc extends Bloc<PostFormEvent, PostFormState> {
         emit(PostFormLoadSuccess(data: newPost));
       },
     );
+  }
+
+  Future<void> _onPostFormPrefilled(
+    PostFormPrefilled event,
+    Emitter<PostFormState> emit,
+  ) async {
+    emit(const PostFormLoadInProgress());
+
+    final result = await _getPostDetailUseCase(event.postId);
+
+    result.fold(
+      (failure) => emit(PostFormLoadFailure(failure: failure)),
+      (post) => emit(PostFormLoadSuccess(data: post)),
+    );
+  }
+
+  Future<void> _onPostEdited(
+    PostEdited event,
+    Emitter<PostFormState> emit,
+  ) async {
+    emit(const PostFormLoadInProgress());
+
+    await Future.delayed(const Duration(seconds: 1));
+
+    final result = await _updatePostUseCase(
+      UpdatePostParams(
+        originalPost: event.originalPost,
+        newTitle: event.newTitle,
+        newContent: event.newContent,
+        newImageFile: event.newImageFile,
+        imageWasRemoved: event.imageWasRemoved,
+      ),
+    );
+
+    result.fold((failure) => emit(PostFormLoadFailure(failure: failure)), (
+      updatedPost,
+    ) {
+      _globalEventBus.add(PostUpdatedDispatched(post: updatedPost));
+      emit(PostFormLoadSuccess(data: updatedPost));
+    });
   }
 }
