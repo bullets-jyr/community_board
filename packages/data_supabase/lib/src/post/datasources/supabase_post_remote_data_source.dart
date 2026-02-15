@@ -231,4 +231,103 @@ class SupabasePostRemoteDataSource implements PostRemoteDataSource {
       throw UnknownException(message: e.toString());
     }
   }
+
+  @override
+  Future<CommentDisplayModel> createComment({
+    required String postId,
+    required String content,
+  }) async {
+    try {
+      if (_supabaseClient.auth.currentUser == null) {
+        throw const AuthenticationException(
+          message: 'User not authenticated for creating comment.',
+        );
+      }
+
+      final result = await _supabaseClient
+          .rpc(
+            DBFunctions.createCommentAndReturnCommentDisplayView,
+            params: {'p_post_id': postId, 'p_content': content},
+          )
+          .single();
+
+      return CommentDisplayModel.fromJson(result);
+    } on AuthenticationException {
+      rethrow;
+    } on PostgrestException catch (e) {
+      if (e.code == PostgresErrors.insufficientPrivilege) {
+        throw PermissionException(message: e.message);
+      }
+      if (e.code == PostgresErrors.moreThanOneOrNoItemsReturned) {
+        throw NotFoundException(message: e.message);
+      }
+      throw DatabaseException(message: e.message);
+    } on SocketException {
+      throw const NetworkException();
+    } catch (e) {
+      throw UnknownException(message: e.toString());
+    }
+  }
+
+  @override
+  Future<void> deleteComment({required String commentId}) async {
+    try {
+      if (_supabaseClient.auth.currentUser == null) {
+        throw const AuthenticationException(
+          message: 'User is not authenticated',
+        );
+      }
+      await _supabaseClient.from(Tables.comments).delete().match({
+        'id': commentId,
+      });
+    } on AuthenticationException {
+      rethrow;
+    } on PostgrestException catch (e) {
+      if (e.code == PostgresErrors.insufficientPrivilege) {
+        throw PermissionException(message: e.message);
+      }
+      throw DatabaseException(message: e.message);
+    } on SocketException {
+      throw const NetworkException();
+    } catch (e) {
+      throw UnknownException(message: e.toString());
+    }
+  }
+
+  @override
+  Future<CommentDisplayModel> updateComment({
+    required String commentId,
+    required String newContent,
+  }) async {
+    try {
+      if (_supabaseClient.auth.currentUser == null) {
+        throw const AuthenticationException(
+          message: 'User is not authenticated',
+        );
+      }
+
+      final updatedCommentMap = await _supabaseClient
+          .rpc(
+            DBFunctions.updateCommentAndReturnCommentDisplayView,
+            params: {'p_comment_id': commentId, 'p_new_content': newContent},
+          )
+          .single();
+
+      return CommentDisplayModel.fromJson(updatedCommentMap);
+    } on AuthenticationException {
+      rethrow;
+    } on PostgrestException catch (e) {
+      if (e.code == PostgresErrors.insufficientPrivilege) {
+        throw PermissionException(message: e.message);
+      }
+      if (e.code == PostgresErrors.moreThanOneOrNoItemsReturned) {
+        throw NotFoundException(message: e.message);
+      }
+      throw DatabaseException(message: e.message);
+    } on SocketException {
+      throw const NetworkException();
+    } catch (e) {
+      throw UnknownException(message: e.toString());
+    }
+  }
 }

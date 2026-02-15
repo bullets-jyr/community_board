@@ -33,4 +33,16 @@ abstract interface class PostRemoteDataSource {
   });
 
   Future<LikeResultModel> toggleLike({required String postId});
+
+  Future<CommentDisplayModel> createComment({
+    required String postId,
+    required String content,
+  });
+
+  Future<void> deleteComment({required String commentId});
+
+  Future<CommentDisplayModel> updateComment({
+    required String commentId,
+    required String newContent,
+  });
 }
