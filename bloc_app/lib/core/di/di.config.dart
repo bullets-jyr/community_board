@@ -22,6 +22,8 @@ import '../../features/auth/presentation/blocs/authentication/authentication_blo
     as _i652;
 import '../../features/auth/presentation/blocs/login/login_bloc.dart' as _i1018;
 import '../../features/auth/presentation/blocs/signup/signup_bloc.dart' as _i41;
+import '../../features/post/presentation/blocs/post_detail/post_detail_bloc.dart'
+    as _i169;
 import '../../features/post/presentation/blocs/post_form/post_form_bloc.dart'
     as _i79;
 import '../../features/post/presentation/blocs/post_list/post_list_bloc.dart'
@@ -70,6 +72,17 @@ extension GetItInjectableX on _i174.GetIt {
     gh.factory<_i456.CreatePostUseCase>(() => registerModule.createPostUseCase);
     gh.factory<_i456.UploadPostImageUseCase>(
       () => registerModule.uploadPostImageUseCase,
+    );
+    gh.factory<_i456.GetPostDetailUseCase>(
+      () => registerModule.getPostDetailUseCase,
+    );
+    gh.factory<_i456.GetCommentsUseCase>(
+      () => registerModule.getCommentsUseCase,
+    );
+    gh.factory<_i169.PostDetailBloc>(
+      () => _i169.PostDetailBloc(
+        getPostDetailUseCase: gh<_i456.GetPostDetailUseCase>(),
+      ),
     );
     gh.factory<_i79.PostFormBloc>(
       () => _i79.PostFormBloc(
@@ -143,4 +156,14 @@ class _$RegisterModule extends _i291.RegisterModule {
       _i456.UploadPostImageUseCase(
         postRepository: _getIt<_i456.PostRepository>(),
       );
+
+  @override
+  _i456.GetPostDetailUseCase get getPostDetailUseCase =>
+      _i456.GetPostDetailUseCase(
+        postRepository: _getIt<_i456.PostRepository>(),
+      );
+
+  @override
+  _i456.GetCommentsUseCase get getCommentsUseCase =>
+      _i456.GetCommentsUseCase(postRepository: _getIt<_i456.PostRepository>());
 }
