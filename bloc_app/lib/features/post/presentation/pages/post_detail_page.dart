@@ -1,4 +1,5 @@
 import 'package:cached_network_image/cached_network_image.dart';
+import 'package:core/constants.dart';
 import 'package:core/utils.dart';
 import 'package:domain/post.dart';
 import 'package:flutter/material.dart';
@@ -32,7 +33,36 @@ class PostDetailPage extends StatelessWidget {
               getIt<CommentListBloc>()..add(CommentListFetched(postId: postId)),
         ),
       ],
-      child: PostDetailView(postId: postId),
+      child: BlocListener<PostDetailBloc, PostDetailState>(
+        listenWhen: (previous, current) {
+          final didDelete =
+              !previous.deletionSuccess && current.deletionSuccess;
+          final didFail =
+              previous.transientFailure == null &&
+              current.transientFailure != null;
+
+          return didDelete || didFail;
+        },
+        listener: (context, state) {
+          if (state.deletionSuccess) {
+            final navigator = Navigator.of(context);
+            if (navigator.canPop()) navigator.pop();
+            if (navigator.canPop()) navigator.pop();
+            return;
+          }
+
+          if (state.transientFailure != null) {
+            showErrorSnackbar(
+              context,
+              message: state.transientFailure!.message,
+            );
+            context.read<PostDetailBloc>().add(
+              PostDetailTransientFailureConsumed(),
+            );
+          }
+        },
+        child: PostDetailView(postId: postId),
+      ),
     );
   }
 }
@@ -71,8 +101,66 @@ class _PostDetailViewState extends State<PostDetailView> {
     }
   }
 
+  void _showDeleteConfirmDialog(BuildContext context) {
+    final postDetailBloc = context.read<PostDetailBloc>();
+
+    showDialog(
+      context: context,
+      builder: (context) {
+        return BlocProvider.value(
+          value: postDetailBloc,
+          child: BlocBuilder<PostDetailBloc, PostDetailState>(
+            builder: (context, state) {
+              final isSubmitting = state.status == PostDetailStatus.submitting;
+
+              return PopScope(
+                canPop: !isSubmitting,
+                child: AlertDialog(
+                  title: const Text('Confirm Deletion'),
+                  content: const Text(
+                    'Are you sure you want to delete this post?',
+                  ),
+                  actions: [
+                    TextButton(
+                      onPressed: isSubmitting
+                          ? null
+                          : () => Navigator.of(context).pop(),
+                      child: const Text('Cancel'),
+                    ),
+                    TextButton(
+                      onPressed: isSubmitting
+                          ? null
+                          : () {
+                              postDetailBloc.add(const PostDeleted());
+                            },
+                      style: TextButton.styleFrom(foregroundColor: Colors.red),
+                      child: isSubmitting
+                          ? const SizedBox(
+                              height: 20,
+                              width: 20,
+                              child: CircularProgressIndicator(strokeWidth: 2),
+                            )
+                          : const Text('Delete'),
+                    ),
+                  ],
+                ),
+              );
+            },
+          ),
+        );
+      },
+      barrierDismissible:
+          postDetailBloc.state.status != PostDetailStatus.submitting,
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
+    final currentUser = context.select(
+      (AuthenticationBloc bloc) => bloc.state.user,
+    );
+    final currentUserRole = currentUser?.role;
+
     return BlocBuilder<PostDetailBloc, PostDetailState>(
       builder: (context, state) {
         switch (state.status) {
@@ -98,10 +186,34 @@ class _PostDetailViewState extends State<PostDetailView> {
 
           case _:
             final post = state.post!;
+            final canModify =
+                (currentUser?.id == post.authorId) &&
+                (currentUserRole == Roles.admin);
 
             return Scaffold(
               appBar: AppBar(
                 title: Text(post.title, style: const TextStyle(fontSize: 18)),
+                actions: [
+                  if (canModify)
+                    IconButton(
+                      onPressed: () {
+                        context.pushNamed(
+                          RouteNames.postEdit,
+                          pathParameters: {'postId': post.postId},
+                        );
+                      },
+                      icon: const Icon(Icons.edit_outlined),
+                      tooltip: 'Edit Post',
+                    ),
+                  if (canModify)
+                    IconButton(
+                      onPressed: () {
+                        _showDeleteConfirmDialog(context);
+                      },
+                      icon: const Icon(Icons.delete_outline),
+                      tooltip: 'Delete Post',
+                    ),
+                ],
               ),
               body: Column(
                 children: [
