@@ -65,6 +65,9 @@ abstract class RegisterModule {
   @injectable
   GetCommentsUseCase get getCommentsUseCase;
 
+  @injectable
+  ToggleLikeUseCase get toggleLikeUseCase;
+
   // profile
 
 
