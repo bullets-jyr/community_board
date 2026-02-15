@@ -82,16 +82,20 @@ extension GetItInjectableX on _i174.GetIt {
       () => registerModule.getCommentsUseCase,
     );
     gh.factory<_i456.ToggleLikeUseCase>(() => registerModule.toggleLikeUseCase);
+    gh.factory<_i456.CreateCommentUseCase>(
+      () => registerModule.createCommentUseCase,
+    );
+    gh.factory<_i456.DeleteCommentUseCase>(
+      () => registerModule.deleteCommentUseCase,
+    );
+    gh.factory<_i456.UpdateCommentUseCase>(
+      () => registerModule.updateCommentUseCase,
+    );
     gh.factory<_i169.PostDetailBloc>(
       () => _i169.PostDetailBloc(
         getPostDetailUseCase: gh<_i456.GetPostDetailUseCase>(),
         toggleLikeUseCase: gh<_i456.ToggleLikeUseCase>(),
         globalEventBus: gh<_i91.GlobalEventBus>(),
-      ),
-    );
-    gh.factory<_i1009.CommentListBloc>(
-      () => _i1009.CommentListBloc(
-        getCommentsUseCase: gh<_i456.GetCommentsUseCase>(),
       ),
     );
     gh.factory<_i409.PostListBloc>(
@@ -105,6 +109,16 @@ extension GetItInjectableX on _i174.GetIt {
       () => _i79.PostFormBloc(
         createPostUseCase: gh<_i456.CreatePostUseCase>(),
         uploadPostImageUseCase: gh<_i456.UploadPostImageUseCase>(),
+        globalEventBus: gh<_i91.GlobalEventBus>(),
+      ),
+    );
+    gh.factory<_i1009.CommentListBloc>(
+      () => _i1009.CommentListBloc(
+        getCommentsUseCase: gh<_i456.GetCommentsUseCase>(),
+        createCommentUseCase: gh<_i456.CreateCommentUseCase>(),
+        deleteCommentUseCase: gh<_i456.DeleteCommentUseCase>(),
+        updateCommentUseCase: gh<_i456.UpdateCommentUseCase>(),
+        getPostDetailUseCase: gh<_i456.GetPostDetailUseCase>(),
         globalEventBus: gh<_i91.GlobalEventBus>(),
       ),
     );
@@ -181,4 +195,22 @@ class _$RegisterModule extends _i291.RegisterModule {
   @override
   _i456.ToggleLikeUseCase get toggleLikeUseCase =>
       _i456.ToggleLikeUseCase(postRepository: _getIt<_i456.PostRepository>());
+
+  @override
+  _i456.CreateCommentUseCase get createCommentUseCase =>
+      _i456.CreateCommentUseCase(
+        postRepository: _getIt<_i456.PostRepository>(),
+      );
+
+  @override
+  _i456.DeleteCommentUseCase get deleteCommentUseCase =>
+      _i456.DeleteCommentUseCase(
+        postRepository: _getIt<_i456.PostRepository>(),
+      );
+
+  @override
+  _i456.UpdateCommentUseCase get updateCommentUseCase =>
+      _i456.UpdateCommentUseCase(
+        postRepository: _getIt<_i456.PostRepository>(),
+      );
 }
