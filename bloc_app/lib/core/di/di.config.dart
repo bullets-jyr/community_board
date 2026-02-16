@@ -44,6 +44,7 @@ import '../../features/profile/presentation/blocs/user_profile/user_profile_bloc
     as _i634;
 import '../../features/search/presentation/blocs/search/search_bloc.dart'
     as _i608;
+import '../blocs/realtime/realtime_bloc.dart' as _i743;
 import '../bus/global_event_bus.dart' as _i91;
 import 'register_module.dart' as _i291;
 
@@ -93,6 +94,11 @@ extension GetItInjectableX on _i174.GetIt {
         logoutUseCase: gh<_i378.LogoutUseCase>(),
       ),
       dispose: (i) => i.close(),
+    );
+    gh.factory<_i743.RealtimeBloc>(
+      () => _i743.RealtimeBloc(
+        realtimeRepository: gh<_i456.RealtimeRepository>(),
+      ),
     );
     gh.factory<_i1018.LoginBloc>(
       () => _i1018.LoginBloc(loginUseCase: gh<_i378.LoginUseCase>()),
