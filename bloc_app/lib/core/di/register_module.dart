@@ -99,5 +99,8 @@ abstract class RegisterModule {
   @injectable
   UpdateProfileUseCase get upateProfileUseCase;
 
+  @injectable
+  GetMyPostsUseCase get getMyPostsUseCase;
+
   // search
 }

@@ -1,3 +1,4 @@
+import 'package:domain/auth.dart';
 import 'package:domain/post.dart';
 import 'package:equatable/equatable.dart';
 
@@ -33,4 +34,13 @@ final class PostDeletedDispatched extends GlobalEvent {
 
   @override
   List<Object?> get props => [postId];
+}
+
+final class ProfileUpdatedDispatched extends GlobalEvent {
+  const ProfileUpdatedDispatched({required this.profile});
+
+  final UserEntity profile;
+
+  @override
+  List<Object?> get props => [profile];
 }
