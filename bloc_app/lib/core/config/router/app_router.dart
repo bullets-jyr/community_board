@@ -102,12 +102,12 @@ GoRouter createRouter(AuthenticationBloc authBloc) {
       StatefulShellRoute.indexedStack(
         builder:
             (
-            BuildContext context,
-            GoRouterState state,
-            StatefulNavigationShell navigationShell,
+              BuildContext context,
+              GoRouterState state,
+              StatefulNavigationShell navigationShell,
             ) {
-          return ScaffoldWithNavBar(navigationShell: navigationShell);
-        },
+              return ScaffoldWithNavBar(navigationShell: navigationShell);
+            },
         branches: [
           StatefulShellBranch(
             routes: [

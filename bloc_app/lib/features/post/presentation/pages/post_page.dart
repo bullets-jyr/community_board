@@ -2,7 +2,6 @@ import 'package:core/utils.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 
-import '../../../../core/di/di.dart';
 import '../blocs/post_list/post_list_bloc.dart';
 import '../widgets/post_card.dart';
 
@@ -11,10 +10,7 @@ class PostPage extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return BlocProvider(
-      create: (context) => getIt<PostListBloc>()..add(PostListFetched()),
-      child: const PostView(),
-    );
+    return const PostView();
   }
 }
 
@@ -58,10 +54,23 @@ class _PostViewState extends State<PostView> {
               previous.transientFailure == null &&
               current.transientFailure != null;
 
-          return isTransientFailure;
+          final prevScrollEventId = previous.scrollToTopEventId;
+          final currentScrollEventId = current.scrollToTopEventId;
+          final isScrollToTopEvent =
+              prevScrollEventId != currentScrollEventId &&
+              currentScrollEventId != null;
+
+          return isTransientFailure || isScrollToTopEvent;
         },
         listener: (context, state) {
-          if (state.transientFailure != null) {
+          if (state.scrollToTopEventId != null) {
+            _scrollController.animateTo(
+              0.0,
+              duration: const Duration(milliseconds: 300),
+              curve: Curves.easeOut,
+            );
+            context.read<PostListBloc>().add(PostListScrollEventConsumed());
+          } else if (state.transientFailure != null) {
             showErrorSnackbar(
               context,
               message: state.transientFailure!.message,
