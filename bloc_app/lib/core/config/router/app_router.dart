@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:go_router/go_router.dart';
 
 import '../../../features/auth/presentation/blocs/authentication/authentication_bloc.dart';
@@ -7,6 +8,7 @@ import '../../../features/auth/presentation/pages/signup_page.dart';
 import '../../../features/post/presentation/pages/post_detail_page.dart';
 import '../../../features/post/presentation/pages/post_form_page.dart';
 import '../../../features/post/presentation/pages/post_page.dart';
+import '../../../features/profile/presentation/blocs/profile/profile_bloc.dart';
 import '../../../features/profile/presentation/pages/edit_profile_page.dart';
 import '../../../features/profile/presentation/pages/my_profile_page.dart';
 import '../../../features/profile/presentation/pages/user_profile_page.dart';
@@ -23,7 +25,6 @@ GoRouter createRouter(AuthenticationBloc authBloc) {
     refreshListenable: GoRouterRefreshStream(authBloc.stream),
     redirect: (BuildContext context, GoRouterState state) {
       final authStatus = authBloc.state.status;
-      // 사용자가 가려고 하는 경로
       final String location = state.matchedLocation;
 
       final isSplash = location == RoutePaths.splash;
@@ -40,7 +41,6 @@ GoRouter createRouter(AuthenticationBloc authBloc) {
         if (!isAuthRoute) return RoutePaths.login;
       }
 
-      // 요청받은 페이지 표시
       return null;
     },
     routes: [
@@ -102,12 +102,12 @@ GoRouter createRouter(AuthenticationBloc authBloc) {
       StatefulShellRoute.indexedStack(
         builder:
             (
-              BuildContext context,
-              GoRouterState state,
-              StatefulNavigationShell navigationShell,
+            BuildContext context,
+            GoRouterState state,
+            StatefulNavigationShell navigationShell,
             ) {
-              return ScaffoldWithNavBar(navigationShell: navigationShell);
-            },
+          return ScaffoldWithNavBar(navigationShell: navigationShell);
+        },
         branches: [
           StatefulShellBranch(
             routes: [
@@ -146,7 +146,11 @@ GoRouter createRouter(AuthenticationBloc authBloc) {
                     path: RoutePaths.profileEdit,
                     name: RouteNames.profileEdit,
                     builder: (BuildContext context, GoRouterState state) {
-                      return const EditProfilePage();
+                      final profileBloc = state.extra as ProfileBloc;
+                      return BlocProvider.value(
+                        value: profileBloc,
+                        child: const EditProfilePage(),
+                      );
                     },
                   ),
                 ],
