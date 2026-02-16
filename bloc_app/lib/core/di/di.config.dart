@@ -63,6 +63,10 @@ extension GetItInjectableX on _i174.GetIt {
     gh.lazySingleton<_i561.AuthRemoteDataSource>(
       () => registerModule.authRemoteDataSource,
     );
+    gh.lazySingleton<_i816.RealtimeRemoteDataSource>(
+      () => registerModule.realtimeRemoteDataSource,
+      dispose: _i291.disposeRealtimeDataSource,
+    );
     gh.lazySingleton<_i816.PostRemoteDataSource>(
       () => registerModule.postRemoteDataSource,
     );
@@ -77,6 +81,9 @@ extension GetItInjectableX on _i174.GetIt {
     gh.factory<_i378.SignupUseCase>(() => registerModule.signupUseCase);
     gh.factory<_i378.LoginUseCase>(() => registerModule.loginUseCase);
     gh.factory<_i378.LogoutUseCase>(() => registerModule.logoutUseCase);
+    gh.lazySingleton<_i456.RealtimeRepository>(
+      () => registerModule.realtimeRepository,
+    );
     gh.factory<_i41.SignupBloc>(
       () => _i41.SignupBloc(signupUseCase: gh<_i378.SignupUseCase>()),
     );
@@ -219,6 +226,12 @@ class _$RegisterModule extends _i291.RegisterModule {
       );
 
   @override
+  _i816.SupabaseRealtimeRemoteDataSource get realtimeRemoteDataSource =>
+      _i816.SupabaseRealtimeRemoteDataSource(
+        supabaseClient: _getIt<_i454.SupabaseClient>(),
+      );
+
+  @override
   _i816.SupabasePostRemoteDataSource get postRemoteDataSource =>
       _i816.SupabasePostRemoteDataSource(
         supabaseClient: _getIt<_i454.SupabaseClient>(),
@@ -257,6 +270,13 @@ class _$RegisterModule extends _i291.RegisterModule {
   @override
   _i378.LogoutUseCase get logoutUseCase =>
       _i378.LogoutUseCase(authRepository: _getIt<_i378.AuthRepository>());
+
+  @override
+  _i816.RealtimeRepositoryImpl get realtimeRepository =>
+      _i816.RealtimeRepositoryImpl(
+        realtimeRemoteDataSource: _getIt<_i816.RealtimeRemoteDataSource>(),
+        postRemoteDataSource: _getIt<_i816.PostRemoteDataSource>(),
+      );
 
   @override
   _i66.SearchRepositoryImpl get searchRepository => _i66.SearchRepositoryImpl(

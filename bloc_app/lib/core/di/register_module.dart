@@ -1,3 +1,5 @@
+import 'dart:async';
+
 import 'package:data_supabase/auth.dart';
 import 'package:data_supabase/post.dart';
 import 'package:data_supabase/profile.dart';
@@ -12,6 +14,10 @@ import 'package:supabase_flutter/supabase_flutter.dart';
 
 import '../../features/auth/presentation/blocs/authentication/authentication_bloc.dart';
 import '../config/router/app_router.dart';
+
+FutureOr<void> disposeRealtimeDataSource(RealtimeRemoteDataSource instance) {
+  instance.dispose();
+}
 
 @module
 abstract class RegisterModule {
@@ -35,6 +41,16 @@ abstract class RegisterModule {
 
   @LazySingleton(as: PostRepository)
   PostRepositoryImpl get postRepository;
+
+  // post - realtime
+  @LazySingleton(
+    as: RealtimeRemoteDataSource,
+    dispose: disposeRealtimeDataSource,
+  )
+  SupabaseRealtimeRemoteDataSource get realtimeRemoteDataSource;
+
+  @LazySingleton(as: RealtimeRepository)
+  RealtimeRepositoryImpl get realtimeRepository;
 
   // profile
   @LazySingleton(as: ProfileRemoteDataSource)
