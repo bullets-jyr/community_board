@@ -1,19 +1,12 @@
 part of 'post_list_bloc.dart';
 
 enum PostListStatus {
-  // 초기
   initial,
-  // 로딩 중
   loading,
-  // 로딩 성공
   loaded,
-  // 로딩 실패
   failure,
-  // 다음 페이지 로딩 중
   fetchingNextPage,
-  // 삭제 후 목록을 채우기 위한 로딩 중
   refilling,
-  // 새로고침
   refreshing,
 }
 
@@ -30,9 +23,7 @@ class PostListState extends Equatable {
   final PostListStatus status;
   final List<PostDisplay> posts;
   final bool hasReachedMax;
-  // 초기 실패
   final Failure? failure;
-  // 일시적인 실패
   final Failure? transientFailure;
   final int? scrollToTopEventId;
 

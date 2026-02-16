@@ -12,6 +12,7 @@ import '../../handlers/pagination_handler.dart';
 import '../../handlers/toggle_like_handler.dart';
 
 part 'post_list_event.dart';
+
 part 'post_list_state.dart';
 
 const _pageSize = 5;
@@ -23,9 +24,9 @@ class PostListBloc extends Bloc<PostListEvent, PostListState> {
     required ToggleLikeUseCase toggleLikeUseCase,
     required GlobalEventBus globalEventBus,
   }) : _getPostsUseCase = getPostsUseCase,
-        _toggleLikeUseCase = toggleLikeUseCase,
-        _globalEventBus = globalEventBus,
-        super(const PostListState()) {
+       _toggleLikeUseCase = toggleLikeUseCase,
+       _globalEventBus = globalEventBus,
+       super(const PostListState()) {
     _paginationHandler = PaginationHandler();
     _toggleLikeHandler = ToggleLikeHandler(
       toggleLikeUseCase: _toggleLikeUseCase,
@@ -59,14 +60,14 @@ class PostListBloc extends Bloc<PostListEvent, PostListState> {
 
   bool get _isBusy =>
       state.status == PostListStatus.loading ||
-          state.status == PostListStatus.fetchingNextPage ||
-          state.status == PostListStatus.refilling ||
-          state.status == PostListStatus.refreshing;
+      state.status == PostListStatus.fetchingNextPage ||
+      state.status == PostListStatus.refilling ||
+      state.status == PostListStatus.refreshing;
 
   Future<void> _onPostListFetched(
-      PostListFetched event,
-      Emitter<PostListState> emit,
-      ) async {
+    PostListFetched event,
+    Emitter<PostListState> emit,
+  ) async {
     if (_isBusy) return;
 
     emit(state.copyWith(status: PostListStatus.loading));
@@ -76,7 +77,7 @@ class PostListBloc extends Bloc<PostListEvent, PostListState> {
     );
 
     result.fold(
-          (failure) {
+      (failure) {
         emit(
           state.copyWith(
             status: PostListStatus.failure,
@@ -84,7 +85,7 @@ class PostListBloc extends Bloc<PostListEvent, PostListState> {
           ),
         );
       },
-          (posts) {
+      (posts) {
         emit(
           state.copyWith(
             status: PostListStatus.loaded,
@@ -97,9 +98,9 @@ class PostListBloc extends Bloc<PostListEvent, PostListState> {
   }
 
   Future<void> _onPostListNextPageFetched(
-      PostListNextPageFetched event,
-      Emitter<PostListState> emit,
-      ) async {
+    PostListNextPageFetched event,
+    Emitter<PostListState> emit,
+  ) async {
     if (_isBusy || state.hasReachedMax) return;
 
     emit(state.copyWith(status: PostListStatus.fetchingNextPage));
@@ -156,9 +157,9 @@ class PostListBloc extends Bloc<PostListEvent, PostListState> {
   // }
 
   Future<void> _onPostListRefreshed(
-      PostListRefreshed event,
-      Emitter<PostListState> emit,
-      ) async {
+    PostListRefreshed event,
+    Emitter<PostListState> emit,
+  ) async {
     if (_isBusy) return;
 
     emit(state.copyWith(status: PostListStatus.refreshing));
@@ -168,13 +169,13 @@ class PostListBloc extends Bloc<PostListEvent, PostListState> {
     );
 
     result.fold(
-          (failure) => emit(
+      (failure) => emit(
         state.copyWith(
           status: PostListStatus.loaded,
           transientFailure: () => failure,
         ),
       ),
-          (posts) => emit(
+      (posts) => emit(
         PostListState(
           status: PostListStatus.loaded,
           posts: posts,
@@ -185,16 +186,16 @@ class PostListBloc extends Bloc<PostListEvent, PostListState> {
   }
 
   void _onPostListTransientFailureConsumed(
-      PostListTransientFailureConsumed event,
-      Emitter<PostListState> emit,
-      ) {
+    PostListTransientFailureConsumed event,
+    Emitter<PostListState> emit,
+  ) {
     emit(state.copyWith(transientFailure: () => null));
   }
 
   Future<void> _onPostLikeToggled(
-      PostLikeToggled event,
-      Emitter<PostListState> emit,
-      ) async {
+    PostLikeToggled event,
+    Emitter<PostListState> emit,
+  ) async {
     if (_isBusy) return;
 
     await _toggleLikeHandler.execute(
@@ -268,9 +269,9 @@ class PostListBloc extends Bloc<PostListEvent, PostListState> {
   // }
 
   void _onGlobalEventReceived(
-      _GlobalEventReceived event,
-      Emitter<PostListState> emit,
-      ) {
+    _GlobalEventReceived event,
+    Emitter<PostListState> emit,
+  ) {
     if (state.status != PostListStatus.fetchingNextPage && _isBusy) return;
 
     switch (event.event) {
@@ -311,9 +312,9 @@ class PostListBloc extends Bloc<PostListEvent, PostListState> {
   }
 
   Future<void> _onPostListRefillRequested(
-      _PostListRefillRequested event,
-      Emitter<PostListState> emit,
-      ) async {
+    _PostListRefillRequested event,
+    Emitter<PostListState> emit,
+  ) async {
     if (_isBusy || state.hasReachedMax) return;
 
     emit(state.copyWith(status: PostListStatus.refilling));
@@ -374,9 +375,9 @@ class PostListBloc extends Bloc<PostListEvent, PostListState> {
   // }
 
   void _onPostListNewPostPrepended(
-      PostListNewPostPrepended event,
-      Emitter<PostListState> emit,
-      ) {
+    PostListNewPostPrepended event,
+    Emitter<PostListState> emit,
+  ) {
     if (state.posts.any((p) => p.postId == event.post.postId)) return;
 
     final updatedPosts = [event.post, ...state.posts];
@@ -384,9 +385,9 @@ class PostListBloc extends Bloc<PostListEvent, PostListState> {
   }
 
   void _onPostListScrollToTopRequested(
-      PostListScrollToTopRequested event,
-      Emitter<PostListState> emit,
-      ) {
+    PostListScrollToTopRequested event,
+    Emitter<PostListState> emit,
+  ) {
     emit(
       state.copyWith(
         scrollToTopEventId: () => DateTime.now().millisecondsSinceEpoch,
@@ -395,9 +396,9 @@ class PostListBloc extends Bloc<PostListEvent, PostListState> {
   }
 
   void _onPostListScrollEventConsumed(
-      PostListScrollEventConsumed event,
-      Emitter<PostListState> emit,
-      ) {
+    PostListScrollEventConsumed event,
+    Emitter<PostListState> emit,
+  ) {
     emit(state.copyWith(scrollToTopEventId: () => null));
   }
 
