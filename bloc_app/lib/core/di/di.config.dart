@@ -12,9 +12,11 @@
 import 'package:data_supabase/auth.dart' as _i561;
 import 'package:data_supabase/post.dart' as _i816;
 import 'package:data_supabase/profile.dart' as _i661;
+import 'package:data_supabase/search.dart' as _i66;
 import 'package:domain/auth.dart' as _i378;
 import 'package:domain/post.dart' as _i456;
 import 'package:domain/profile.dart' as _i503;
+import 'package:domain/search.dart' as _i93;
 import 'package:get_it/get_it.dart' as _i174;
 import 'package:go_router/go_router.dart' as _i583;
 import 'package:injectable/injectable.dart' as _i526;
@@ -40,6 +42,8 @@ import '../../features/profile/presentation/blocs/profile/profile_bloc.dart'
     as _i349;
 import '../../features/profile/presentation/blocs/user_profile/user_profile_bloc.dart'
     as _i634;
+import '../../features/search/presentation/blocs/search/search_bloc.dart'
+    as _i608;
 import '../bus/global_event_bus.dart' as _i91;
 import 'register_module.dart' as _i291;
 
@@ -63,6 +67,9 @@ extension GetItInjectableX on _i174.GetIt {
       () => registerModule.postRemoteDataSource,
     );
     gh.lazySingleton<_i378.AuthRepository>(() => registerModule.authRepository);
+    gh.lazySingleton<_i66.SearchRemoteDataSource>(
+      () => registerModule.searchRemoteDataSource,
+    );
     gh.lazySingleton<_i661.ProfileRemoteDataSource>(
       () => registerModule.profileRemoteDataSource,
     );
@@ -82,6 +89,9 @@ extension GetItInjectableX on _i174.GetIt {
     );
     gh.factory<_i1018.LoginBloc>(
       () => _i1018.LoginBloc(loginUseCase: gh<_i378.LoginUseCase>()),
+    );
+    gh.lazySingleton<_i93.SearchRepository>(
+      () => registerModule.searchRepository,
     );
     gh.factory<_i456.GetPostsUseCase>(() => registerModule.getPostsUseCase);
     gh.factory<_i456.CreatePostUseCase>(() => registerModule.createPostUseCase);
@@ -151,6 +161,12 @@ extension GetItInjectableX on _i174.GetIt {
         globalEventBus: gh<_i91.GlobalEventBus>(),
       ),
     );
+    gh.factory<_i93.SearchPostsUseCase>(
+      () => registerModule.searchPostsUseCase,
+    );
+    gh.factory<_i93.SearchUsersUseCase>(
+      () => registerModule.searchUsersUseCase,
+    );
     gh.factory<_i146.MyPostListBloc>(
       () => _i146.MyPostListBloc(
         getMyPostsUseCase: gh<_i456.GetMyPostsUseCase>(),
@@ -165,6 +181,14 @@ extension GetItInjectableX on _i174.GetIt {
     gh.factory<_i634.UserProfileBloc>(
       () => _i634.UserProfileBloc(
         getProfileUseCase: gh<_i503.GetProfileUseCase>(),
+      ),
+    );
+    gh.factory<_i608.SearchBloc>(
+      () => _i608.SearchBloc(
+        searchUsersUseCase: gh<_i93.SearchUsersUseCase>(),
+        searchPostsUseCase: gh<_i93.SearchPostsUseCase>(),
+        toggleLikeUseCase: gh<_i456.ToggleLikeUseCase>(),
+        globalEventBus: gh<_i91.GlobalEventBus>(),
       ),
     );
     gh.factory<_i349.ProfileBloc>(
@@ -206,6 +230,12 @@ class _$RegisterModule extends _i291.RegisterModule {
   );
 
   @override
+  _i66.SupabaseSearchRemoteDataSource get searchRemoteDataSource =>
+      _i66.SupabaseSearchRemoteDataSource(
+        supabaseClient: _getIt<_i454.SupabaseClient>(),
+      );
+
+  @override
   _i661.SupabaseProfileRemoteDataSource get profileRemoteDataSource =>
       _i661.SupabaseProfileRemoteDataSource(
         supabaseClient: _getIt<_i454.SupabaseClient>(),
@@ -227,6 +257,11 @@ class _$RegisterModule extends _i291.RegisterModule {
   @override
   _i378.LogoutUseCase get logoutUseCase =>
       _i378.LogoutUseCase(authRepository: _getIt<_i378.AuthRepository>());
+
+  @override
+  _i66.SearchRepositoryImpl get searchRepository => _i66.SearchRepositoryImpl(
+    searchRemoteDataSource: _getIt<_i66.SearchRemoteDataSource>(),
+  );
 
   @override
   _i456.GetPostsUseCase get getPostsUseCase =>
@@ -297,6 +332,16 @@ class _$RegisterModule extends _i291.RegisterModule {
       _i661.ProfileRepositoryImpl(
         profileRemoteDataSource: _getIt<_i661.ProfileRemoteDataSource>(),
       );
+
+  @override
+  _i93.SearchPostsUseCase get searchPostsUseCase => _i93.SearchPostsUseCase(
+    searchRepository: _getIt<_i93.SearchRepository>(),
+  );
+
+  @override
+  _i93.SearchUsersUseCase get searchUsersUseCase => _i93.SearchUsersUseCase(
+    searchRepository: _getIt<_i93.SearchRepository>(),
+  );
 
   @override
   _i503.GetProfileUseCase get getProfileUseCase => _i503.GetProfileUseCase(

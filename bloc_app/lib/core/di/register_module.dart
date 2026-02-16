@@ -1,9 +1,11 @@
 import 'package:data_supabase/auth.dart';
 import 'package:data_supabase/post.dart';
 import 'package:data_supabase/profile.dart';
+import 'package:data_supabase/search.dart';
 import 'package:domain/auth.dart';
 import 'package:domain/post.dart';
 import 'package:domain/profile.dart';
+import 'package:domain/search.dart';
 import 'package:go_router/go_router.dart';
 import 'package:injectable/injectable.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
@@ -42,7 +44,11 @@ abstract class RegisterModule {
   ProfileRepositoryImpl get profileRepository;
 
   // search
+  @LazySingleton(as: SearchRemoteDataSource)
+  SupabaseSearchRemoteDataSource get searchRemoteDataSource;
 
+  @LazySingleton(as: SearchRepository)
+  SearchRepositoryImpl get searchRepository;
 
   // --- Domain Layer (UseCases) Registration (Injectable - factory) ---
   // auth
@@ -103,4 +109,9 @@ abstract class RegisterModule {
   GetMyPostsUseCase get getMyPostsUseCase;
 
   // search
+  @injectable
+  SearchPostsUseCase get searchPostsUseCase;
+
+  @injectable
+  SearchUsersUseCase get searchUsersUseCase;
 }
