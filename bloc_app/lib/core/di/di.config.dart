@@ -34,6 +34,8 @@ import '../../features/post/presentation/blocs/post_form/post_form_bloc.dart'
     as _i79;
 import '../../features/post/presentation/blocs/post_list/post_list_bloc.dart'
     as _i409;
+import '../../features/profile/presentation/blocs/edit_profile/edit_profile_bloc.dart'
+    as _i1033;
 import '../../features/profile/presentation/blocs/profile/profile_bloc.dart'
     as _i349;
 import '../../features/profile/presentation/blocs/user_profile/user_profile_bloc.dart'
@@ -169,6 +171,12 @@ extension GetItInjectableX on _i174.GetIt {
       () => _i349.ProfileBloc(
         getProfileUseCase: gh<_i503.GetProfileUseCase>(),
         authenticationBloc: gh<_i652.AuthenticationBloc>(),
+      ),
+    );
+    gh.factory<_i1033.EditProfileBloc>(
+      () => _i1033.EditProfileBloc(
+        updateProfileUseCase: gh<_i503.UpdateProfileUseCase>(),
+        globalEventBus: gh<_i91.GlobalEventBus>(),
       ),
     );
     return this;
