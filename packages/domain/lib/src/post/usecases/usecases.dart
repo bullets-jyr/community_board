@@ -10,3 +10,4 @@ export 'update_comment_usecase.dart';
 export 'delete_post_usecase.dart';
 export 'delete_post_folder_usecase.dart';
 export 'update_post_usecase.dart';
+export 'get_my_posts_usecase.dart';

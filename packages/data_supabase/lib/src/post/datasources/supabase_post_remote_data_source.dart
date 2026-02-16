@@ -434,4 +434,37 @@ class SupabasePostRemoteDataSource implements PostRemoteDataSource {
       throw UnknownException(message: e.toString());
     }
   }
+
+  @override
+  Future<List<PostDisplayModel>> getMyPosts({
+    required String userId,
+    required int offset,
+    required int limit,
+  }) async {
+    try {
+      if (_supabaseClient.auth.currentUser == null) {
+        throw const AuthenticationException(
+          message: 'User is not authenticated',
+        );
+      }
+
+      final result = await _supabaseClient.rpc(
+        DBFunctions.getMyPosts,
+        params: {'p_author_id': userId, 'p_offset': offset, 'p_limit': limit},
+      );
+      final postMaps = List<Map<String, dynamic>>.from(result as List);
+      return postMaps.map((json) => PostDisplayModel.fromJson(json)).toList();
+    } on AuthenticationException {
+      rethrow;
+    } on PostgrestException catch (e) {
+      if (e.code == PostgresErrors.insufficientPrivilege) {
+        throw PermissionException(message: e.message);
+      }
+      throw DatabaseException(message: e.message);
+    } on SocketException {
+      throw const NetworkException();
+    } catch (e) {
+      throw UnknownException(message: e.toString());
+    }
+  }
 }
