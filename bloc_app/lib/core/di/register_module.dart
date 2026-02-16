@@ -1,7 +1,9 @@
 import 'package:data_supabase/auth.dart';
 import 'package:data_supabase/post.dart';
+import 'package:data_supabase/profile.dart';
 import 'package:domain/auth.dart';
 import 'package:domain/post.dart';
+import 'package:domain/profile.dart';
 import 'package:go_router/go_router.dart';
 import 'package:injectable/injectable.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
@@ -33,7 +35,11 @@ abstract class RegisterModule {
   PostRepositoryImpl get postRepository;
 
   // profile
+  @LazySingleton(as: ProfileRemoteDataSource)
+  SupabaseProfileRemoteDataSource get profileRemoteDataSource;
 
+  @LazySingleton(as: ProfileRepository)
+  ProfileRepositoryImpl get profileRepository;
 
   // search
 
@@ -87,7 +93,11 @@ abstract class RegisterModule {
   UpdatePostUseCase get updatePostUseCase;
 
   // profile
+  @injectable
+  GetProfileUseCase get getProfileUseCase;
 
+  @injectable
+  UpdateProfileUseCase get upateProfileUseCase;
 
   // search
 }

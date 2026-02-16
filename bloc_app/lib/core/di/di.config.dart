@@ -11,8 +11,10 @@
 // ignore_for_file: no_leading_underscores_for_library_prefixes
 import 'package:data_supabase/auth.dart' as _i561;
 import 'package:data_supabase/post.dart' as _i816;
+import 'package:data_supabase/profile.dart' as _i661;
 import 'package:domain/auth.dart' as _i378;
 import 'package:domain/post.dart' as _i456;
+import 'package:domain/profile.dart' as _i503;
 import 'package:get_it/get_it.dart' as _i174;
 import 'package:go_router/go_router.dart' as _i583;
 import 'package:injectable/injectable.dart' as _i526;
@@ -30,6 +32,8 @@ import '../../features/post/presentation/blocs/post_form/post_form_bloc.dart'
     as _i79;
 import '../../features/post/presentation/blocs/post_list/post_list_bloc.dart'
     as _i409;
+import '../../features/profile/presentation/blocs/profile/profile_bloc.dart'
+    as _i349;
 import '../bus/global_event_bus.dart' as _i91;
 import 'register_module.dart' as _i291;
 
@@ -53,6 +57,9 @@ extension GetItInjectableX on _i174.GetIt {
       () => registerModule.postRemoteDataSource,
     );
     gh.lazySingleton<_i378.AuthRepository>(() => registerModule.authRepository);
+    gh.lazySingleton<_i661.ProfileRemoteDataSource>(
+      () => registerModule.profileRemoteDataSource,
+    );
     gh.lazySingleton<_i456.PostRepository>(() => registerModule.postRepository);
     gh.factory<_i378.SignupUseCase>(() => registerModule.signupUseCase);
     gh.factory<_i378.LoginUseCase>(() => registerModule.loginUseCase);
@@ -96,6 +103,9 @@ extension GetItInjectableX on _i174.GetIt {
       () => registerModule.deletePostFolderUseCase,
     );
     gh.factory<_i456.UpdatePostUseCase>(() => registerModule.updatePostUseCase);
+    gh.lazySingleton<_i503.ProfileRepository>(
+      () => registerModule.profileRepository,
+    );
     gh.factory<_i79.PostFormBloc>(
       () => _i79.PostFormBloc(
         createPostUseCase: gh<_i456.CreatePostUseCase>(),
@@ -134,6 +144,16 @@ extension GetItInjectableX on _i174.GetIt {
         globalEventBus: gh<_i91.GlobalEventBus>(),
       ),
     );
+    gh.factory<_i503.GetProfileUseCase>(() => registerModule.getProfileUseCase);
+    gh.factory<_i503.UpdateProfileUseCase>(
+      () => registerModule.upateProfileUseCase,
+    );
+    gh.factory<_i349.ProfileBloc>(
+      () => _i349.ProfileBloc(
+        getProfileUseCase: gh<_i503.GetProfileUseCase>(),
+        authenticationBloc: gh<_i652.AuthenticationBloc>(),
+      ),
+    );
     return this;
   }
 }
@@ -159,6 +179,12 @@ class _$RegisterModule extends _i291.RegisterModule {
   _i561.AuthRepositoryImpl get authRepository => _i561.AuthRepositoryImpl(
     authRemoteDataSource: _getIt<_i561.AuthRemoteDataSource>(),
   );
+
+  @override
+  _i661.SupabaseProfileRemoteDataSource get profileRemoteDataSource =>
+      _i661.SupabaseProfileRemoteDataSource(
+        supabaseClient: _getIt<_i454.SupabaseClient>(),
+      );
 
   @override
   _i816.PostRepositoryImpl get postRepository => _i816.PostRepositoryImpl(
@@ -236,4 +262,21 @@ class _$RegisterModule extends _i291.RegisterModule {
   @override
   _i456.UpdatePostUseCase get updatePostUseCase =>
       _i456.UpdatePostUseCase(postRepository: _getIt<_i456.PostRepository>());
+
+  @override
+  _i661.ProfileRepositoryImpl get profileRepository =>
+      _i661.ProfileRepositoryImpl(
+        profileRemoteDataSource: _getIt<_i661.ProfileRemoteDataSource>(),
+      );
+
+  @override
+  _i503.GetProfileUseCase get getProfileUseCase => _i503.GetProfileUseCase(
+    profileRepository: _getIt<_i503.ProfileRepository>(),
+  );
+
+  @override
+  _i503.UpdateProfileUseCase get upateProfileUseCase =>
+      _i503.UpdateProfileUseCase(
+        profileRepository: _getIt<_i503.ProfileRepository>(),
+      );
 }
